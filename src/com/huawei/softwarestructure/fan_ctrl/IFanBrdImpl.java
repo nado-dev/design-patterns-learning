@@ -1,4 +1,4 @@
-package com.huawei.softwarestructure;
+package com.huawei.softwarestructure.fan_ctrl;
 
 /***********************************************************************
  * Module:  FanBrd.java
@@ -6,16 +6,16 @@ package com.huawei.softwarestructure;
  * Purpose: Defines the Class FanBrd
  ***********************************************************************/
 
-import java.util.*;
+import com.huawei.softwarestructure.Status;
 
 
-public class FanBrd {
+public class IFanBrdImpl implements IFanBrd {
 
     private int slotId;
 
     private FanSpeed currFanSpeed;
 
-    FanBrd(int slotId) {
+    IFanBrdImpl(int slotId) {
         this.slotId = slotId;
         currFanSpeed = FanSpeed.FAN_SPEED_STOP;
         System.out.println("[FanBrd] Brd:"+ slotId+", new brd created");
@@ -25,7 +25,7 @@ public class FanBrd {
         return this.slotId == slotId;
     }
 
-    public Status setFanSpeed(FanSpeed fs) {
+    public Status manualAdjust(FanSpeed fs) {
         setCurrFanSpeed(fs);
         System.out.println("[FanBrd] Brd:"+ slotId+", new Speed Set:" + fs);
         return null;

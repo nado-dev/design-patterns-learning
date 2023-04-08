@@ -1,4 +1,4 @@
-package com.huawei.softwarestructure;
+package com.huawei.softwarestructure.ctrl;
 
 /***********************************************************************
  * Module:  FanCtrlAction.java
@@ -6,14 +6,17 @@ package com.huawei.softwarestructure;
  * Purpose: Defines the Class FanCtrlAction
  ***********************************************************************/
 
+import com.huawei.softwarestructure.*;
+import com.huawei.softwarestructure.fan_ctrl.*;
+
 import java.util.*;
 
 public class FanCtrlAction {
 
-    private final FanMgr fanMgr;
+    private final IFanMgr fanMgr;
 
-    FanCtrlAction() {
-        fanMgr = FanMgr.getInstance();
+    public FanCtrlAction(IFanMgr fanMgr) {
+        this.fanMgr = fanMgr;
     }
 
     public Status initConfig(FanBrdConfig cfg) {
@@ -21,15 +24,15 @@ public class FanCtrlAction {
     }
 
     public Status adjustFanSpeed(int slot, FanSpeed speed) {
-        FanBrd brd = fanMgr.getFanBrdBySlotId(slot);
+        IFanBrd brd = fanMgr.getFanBrdBySlotId(slot);
         if (brd == null) {
             System.out.println("[FanCtrlAction] no brd found: "+slot);
             return new Status(false, "no brd found");
         }
-        return brd.setFanSpeed(speed);
+        return brd.manualAdjust(speed);
     }
 
-    public List<FanBrd> getAvailableFanBrd() {
+    public List<IFanBrd> getAvailableFanBrd() {
         return fanMgr.getFanBrdList();
     }
 }

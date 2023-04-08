@@ -1,12 +1,10 @@
-package com.huawei.softwarestructure;
+package com.huawei.softwarestructure.fan_ctrl;
 
 /***********************************************************************
  * Module:  FanBrdFactory.java
  * Author:  AARONFANG
  * Purpose: Defines the Class FanBrdFactory
  ***********************************************************************/
-
-import java.util.*;
 
 
 public class FanBrdFactory {
@@ -16,7 +14,10 @@ public class FanBrdFactory {
     }
 
 
-    public static FanBrd makeFanBrd(FanBrdConfig cfg) {
-        return new FanBrd(cfg.getSlot());
+    public static IFanBrd makeFanBrd(FanBrdConfig cfg) {
+        if (cfg.getCommType().equals("type1")) {
+            return new IFanBrdImpl(cfg.getSlot());
+        }
+        return null;
     }
 }

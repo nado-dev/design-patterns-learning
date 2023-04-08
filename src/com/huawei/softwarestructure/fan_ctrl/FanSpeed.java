@@ -1,4 +1,4 @@
-package com.huawei.softwarestructure;
+package com.huawei.softwarestructure.fan_ctrl;
 
 public enum FanSpeed {
     FAN_SPEED_STOP(0),

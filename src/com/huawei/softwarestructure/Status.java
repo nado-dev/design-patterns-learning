@@ -4,7 +4,7 @@ public class Status {
     private String desc;
     private boolean result;
 
-    Status(boolean result, String desc) {
+    public Status(boolean result, String desc) {
         this.desc = desc;
         this.result = result;
     }
