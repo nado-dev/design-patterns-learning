@@ -1,5 +1,7 @@
 package com.huawei.softwarestructure.fan_ctrl;
 
+import java.util.List;
+
 /***********************************************************************
  * Module:  FanBrdConfig.java
  * Author:  AARONFANG
@@ -8,14 +10,17 @@ package com.huawei.softwarestructure.fan_ctrl;
 
 public class FanBrdConfig {
 
-    public FanBrdConfig(int slotNum, String commType){
+    public FanBrdConfig(int slotNum, String commType,  List<Integer> srvBrdSlotList){
         this.slot = slotNum;
         this.commType = commType;
+        this.srvBrdSlotList = srvBrdSlotList;
     }
 
     private int slot;
 
     private String commType;
+
+    private List<Integer> srvBrdSlotList;
 
     public void setSlot(int slot) {
         this.slot = slot;
@@ -31,5 +36,13 @@ public class FanBrdConfig {
 
     public void setCommType(String commType) {
         this.commType = commType;
+    }
+
+    public List<Integer> getSrvBrdSlotList() {
+        return srvBrdSlotList;
+    }
+
+    public void setSrvBrdSlotList(List<Integer> srvBrdSlotList) {
+        this.srvBrdSlotList = srvBrdSlotList;
     }
 }

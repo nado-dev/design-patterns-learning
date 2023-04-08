@@ -8,6 +8,6 @@ public interface IFanBrd {
     Status manualAdjust(FanSpeed fs);
     boolean isMatch(int slotId);
     ISrvBrd findSrvBrd(int slot);
-    Status onSrvHot(int slot, int temp);
-    Status onConfigSrvBrd(FanBrdModeType modeType);
+    Status setFanMode(FanBrdModeType modeType);
+    Status configSrvBrds(FanBrdConfig config);
 }

@@ -1,27 +1,55 @@
 package com.huawei.softwarestructure.srv_brd;
 
+import com.huawei.softwarestructure.Alarm;
 import com.huawei.softwarestructure.Status;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SrvBrdImpl implements ISrvBrd{
 
-    private int id;
+    private int slot;
+    private int temp;
+    List<SrvBrdListener> listeners = new ArrayList<>();
+
+    SrvBrdImpl(int slot) {
+        this.slot = slot;
+        // 默认添加报警器作为Listener
+        addListener(Alarm.getInstance());
+    }
 
     @Override
     public Status onTempChange(int temp) {
-        return null;
+        if (temp == this.temp) {
+            return Status.getSuccessStatus("same temp, failed to change");
+        }
+        this.temp = temp;
+        for (SrvBrdListener listener : listeners) {
+            listener.onSrvHot(slot, temp);
+        }
+        return Status.getSuccessStatus("state hot");
     }
 
     @Override
     public Status addListener(SrvBrdListener listener) {
-        return null;
+        listeners.add(listener);
+        return Status.getSuccessStatus("listener added");
     }
 
     @Override
     public int getBrdId() {
-        return id;
+        return slot;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setId(int slot) {
+        this.slot = slot;
+    }
+
+    @Override
+    public String toString() {
+        return "SrvBrdImpl{" +
+                "slot=" + slot +
+                ", temp=" + temp +
+                '}';
     }
 }

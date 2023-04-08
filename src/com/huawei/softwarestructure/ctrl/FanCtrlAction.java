@@ -8,6 +8,7 @@ package com.huawei.softwarestructure.ctrl;
 
 import com.huawei.softwarestructure.*;
 import com.huawei.softwarestructure.fan_ctrl.*;
+import com.huawei.softwarestructure.srv_brd.ISrvBrd;
 
 import java.util.*;
 
@@ -40,6 +41,26 @@ public class FanCtrlAction {
         if (brd == null) {
             return new Status(false, "[FanCtrlAction] no brd found: "+slot);
         }
-        return brd.onConfigSrvBrd(modeType);
+        return brd.setFanMode(modeType);
+    }
+
+    public Status onSrvTempChanged(int slot, int temp) {
+        ISrvBrd srvBrd = getSrvBrdBySlotId(slot);
+        // 模拟业务板温度变化
+        if (srvBrd != null) {
+            return srvBrd.onTempChange(temp);
+        }
+        return Status.getFailStatus("onSrvTempChanged failed");
+    }
+
+    private ISrvBrd getSrvBrdBySlotId(int slot) {
+        List<IFanBrd> fanBrd = getAvailableFanBrd();
+        for (IFanBrd iFanBrd : fanBrd) {
+            ISrvBrd srvBrd =  iFanBrd.findSrvBrd(slot);
+            if (srvBrd != null)
+                return srvBrd;
+        }
+        System.out.println("no such SrvBrd");
+        return null;
     }
 }
