@@ -19,20 +19,27 @@ public class FanCtrlAction {
         this.fanMgr = fanMgr;
     }
 
-    public Status initConfig(FanBrdConfig cfg) {
+    public Status initFanBrdConfig(FanBrdConfig cfg) {
         return fanMgr.initConfig(cfg);
     }
 
-    public Status adjustFanSpeed(int slot, FanSpeed speed) {
+    public Status manualAdjust(int slot, FanSpeed speed) {
         IFanBrd brd = fanMgr.getFanBrdBySlotId(slot);
         if (brd == null) {
-            System.out.println("[FanCtrlAction] no brd found: "+slot);
-            return new Status(false, "no brd found");
+            return new Status(false, "[FanCtrlAction] no brd found: "+slot);
         }
         return brd.manualAdjust(speed);
     }
 
     public List<IFanBrd> getAvailableFanBrd() {
         return fanMgr.getFanBrdList();
+    }
+
+    public Status configFanMode(int slot, FanBrdModeType modeType) {
+        IFanBrd brd = fanMgr.getFanBrdBySlotId(slot);
+        if (brd == null) {
+            return new Status(false, "[FanCtrlAction] no brd found: "+slot);
+        }
+        return brd.onConfigSrvBrd(modeType);
     }
 }

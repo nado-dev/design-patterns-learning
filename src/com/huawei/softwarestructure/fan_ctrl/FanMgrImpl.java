@@ -25,7 +25,7 @@ public class FanMgrImpl implements IFanMgr {
     public Status initConfig(FanBrdConfig cfg) {
         IFanBrd brd = FanBrdFactory.makeFanBrd(cfg);
         IFanBrdList.add(brd);
-        return null;
+        return Status.getSuccessStatus("创建风扇板成功");
     }
 
 

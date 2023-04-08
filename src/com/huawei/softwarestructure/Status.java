@@ -9,11 +9,23 @@ public class Status {
         this.result = result;
     }
 
-    static Status getSuccessStatus() {
-        return new Status(true, "");
+    public static Status getSuccessStatus(String desc) {
+        return new Status(true, desc);
     }
 
-    static Status getFailStatus() {
-        return new Status(false, "");
+    public static Status getFailStatus(String desc) {
+        return new Status(false, desc);
+    }
+
+    @Override
+    public String toString() {
+        return "Status{" +
+                "desc='" + desc + '\'' +
+                ", result=" + result +
+                '}';
+    }
+
+    public void showStatus() {
+        System.out.println(toString());
     }
 }

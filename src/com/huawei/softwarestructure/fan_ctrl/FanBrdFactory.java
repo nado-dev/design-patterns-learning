@@ -16,7 +16,7 @@ public class FanBrdFactory {
 
     public static IFanBrd makeFanBrd(FanBrdConfig cfg) {
         if (cfg.getCommType().equals("type1")) {
-            return new IFanBrdImpl(cfg.getSlot());
+            return new FanBrdImpl(cfg.getSlot());
         }
         return null;
     }
