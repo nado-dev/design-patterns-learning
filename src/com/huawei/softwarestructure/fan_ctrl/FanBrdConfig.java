@@ -1,5 +1,7 @@
 package com.huawei.softwarestructure.fan_ctrl;
 
+import com.huawei.softwarestructure.fan_ctrl.drv.DrvType;
+
 import java.util.List;
 
 /***********************************************************************
@@ -10,7 +12,7 @@ import java.util.List;
 
 public class FanBrdConfig {
 
-    public FanBrdConfig(int slotNum, String commType,  List<Integer> srvBrdSlotList){
+    public FanBrdConfig(int slotNum, DrvType commType, List<Integer> srvBrdSlotList){
         this.slot = slotNum;
         this.commType = commType;
         this.srvBrdSlotList = srvBrdSlotList;
@@ -18,7 +20,7 @@ public class FanBrdConfig {
 
     private int slot;
 
-    private String commType;
+    private DrvType commType;
 
     private List<Integer> srvBrdSlotList;
 
@@ -30,11 +32,11 @@ public class FanBrdConfig {
         return slot;
     }
 
-    public String getCommType() {
+    public DrvType getCommType() {
         return commType;
     }
 
-    public void setCommType(String commType) {
+    public void setCommType(DrvType commType) {
         this.commType = commType;
     }
 

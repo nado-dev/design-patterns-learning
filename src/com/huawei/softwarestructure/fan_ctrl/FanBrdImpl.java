@@ -7,6 +7,10 @@ package com.huawei.softwarestructure.fan_ctrl;
  ***********************************************************************/
 
 import com.huawei.softwarestructure.Status;
+import com.huawei.softwarestructure.fan_ctrl.drv.DrvContext;
+import com.huawei.softwarestructure.fan_ctrl.drv.DrvType;
+import com.huawei.softwarestructure.fan_ctrl.drv.drv_neptune.NeptuneInitStrategy;
+import com.huawei.softwarestructure.fan_ctrl.drv.drv_normal.NormalInitStrategy;
 import com.huawei.softwarestructure.srv_brd.ISrvBrd;
 import com.huawei.softwarestructure.srv_brd.SrvBrdFactory;
 import com.huawei.softwarestructure.srv_brd.SrvBrdListener;
@@ -23,14 +27,29 @@ public class FanBrdImpl implements IFanBrd, SrvBrdListener {
 
     private FanBrdModeType currModeType;
 
-    private List<ISrvBrd> srvBrds;
+    private final List<ISrvBrd> srvBrds = new ArrayList<>();
 
-    FanBrdImpl(int slotId) {
-        this.slotId = slotId;
+    FanBrdImpl(FanBrdConfig cfg) {
+        this.slotId = cfg.getSlot();
         currFanSpeed = FanSpeed.FAN_SPEED_STOP;
         currModeType = FanBrdModeType.Automatic; // 默认自动挡
-        srvBrds = new ArrayList<>();
+        executeConfig(cfg);
         System.out.println("[FanBrd] Brd:"+ slotId+", new brd created, "+toString());
+    }
+
+    /**
+     * 根据风扇种类初始化风扇板信息
+     * @param cfg 配置文件信息
+     */
+    private void executeConfig(FanBrdConfig cfg) {
+        DrvContext drvContext = DrvContext.getInstance();
+        if (cfg.getCommType() == DrvType.Neptune) {
+            drvContext.setStrategy(new NeptuneInitStrategy());
+        }
+        else{
+            drvContext.setStrategy(new NormalInitStrategy());
+        }
+        drvContext.executeStrategy();
     }
 
     public boolean isMatch(int slotId) {

@@ -2,6 +2,8 @@ package com.huawei.softwarestructure;
 
 import com.huawei.softwarestructure.ctrl.FanCtrlAction;
 import com.huawei.softwarestructure.fan_ctrl.*;
+import com.huawei.softwarestructure.fan_ctrl.drv.DrvContext;
+import com.huawei.softwarestructure.fan_ctrl.drv.DrvType;
 import com.huawei.softwarestructure.srv_brd.ISrvBrd;
 
 import java.util.ArrayList;
@@ -16,17 +18,17 @@ public class Test {
         List<Integer> fanBrd1SrvBrd = new ArrayList<>(); // 第一块风扇板(slot:10000)管理的业务板(slot:20001,20002)
         fanBrd1SrvBrd.add(20001);
         fanBrd1SrvBrd.add(20002);
-	    fanCtrlAction.initFanBrdConfig(new FanBrdConfig(10000, "type1", fanBrd1SrvBrd)).showStatus();
+	    fanCtrlAction.initFanBrdConfig(new FanBrdConfig(10000, DrvType.Mars, fanBrd1SrvBrd)).showStatus();
 
         List<Integer> fanBrd2SrvBrd = new ArrayList<>();// 第二块风扇板(slot:10001)管理的业务板(slot:20003,20004)
         fanBrd2SrvBrd.add(20003);
         fanBrd2SrvBrd.add(20004);
-        fanCtrlAction.initFanBrdConfig(new FanBrdConfig(10001, "type1", fanBrd2SrvBrd)).showStatus();
+        fanCtrlAction.initFanBrdConfig(new FanBrdConfig(10001, DrvType.Neptune, fanBrd2SrvBrd)).showStatus();
 
         List<Integer> fanBrd3SrvBrd = new ArrayList<>();// 第三块风扇板(slot:10003)管理的业务板(slot:20005,20006)
         fanBrd3SrvBrd.add(20005);
         fanBrd3SrvBrd.add(20006);
-        fanCtrlAction.initFanBrdConfig(new FanBrdConfig(10002, "type1", fanBrd3SrvBrd)).showStatus();
+        fanCtrlAction.initFanBrdConfig(new FanBrdConfig(10002, DrvType.Venus, fanBrd3SrvBrd)).showStatus();
 
         // 默认为自动挡的情况下，此时进行的调速应该失败
         fanCtrlAction.manualAdjust(10000, FanSpeed.FAN_SPEED_HIGH).showStatus();
