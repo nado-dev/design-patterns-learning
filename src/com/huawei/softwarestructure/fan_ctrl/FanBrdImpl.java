@@ -52,15 +52,13 @@ public class FanBrdImpl implements IFanBrd, SrvBrdListener {
             return Status.getFailStatus("[FanBrd] Brd: "+slotId+", 手动模式下不会根据业务板温度执行任何操作");
         }
         // todo
-        System.out.println("[FanBrdImpl] slot: "+ slot+" overheated， temperature is " + temp);
         if (temp > 70) {
             setCurrFanSpeed(FanSpeed.FAN_SPEED_HIGH);
         }
         else{
             setCurrFanSpeed(FanSpeed.FAN_SPEED_LOW);
         }
-        System.out.println("current fan speed: " + currFanSpeed);
-        return null;
+        return Status.getSuccessStatus("[FanBrdImpl] slot: "+ slot+" overheated， temperature is " + temp+ ", current fan speed: "+ currFanSpeed);
     }
 
     @Override

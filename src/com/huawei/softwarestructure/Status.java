@@ -25,6 +25,10 @@ public class Status {
                 '}';
     }
 
+    public boolean getResult() {
+        return result;
+    }
+
     public void showStatus() {
         System.out.println(toString());
     }

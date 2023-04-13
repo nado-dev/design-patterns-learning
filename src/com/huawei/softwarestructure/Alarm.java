@@ -22,7 +22,7 @@ public class Alarm implements SrvBrdListener {
 
     @Override
     public Status onSrvHot(int slot, int temp) {
-        System.out.println("[Alarm] slot: "+ slot+" overheated， temperature is" + temp);
+        System.out.println("[Alarm] slot: "+ slot+" overheated， temperature is " + temp);
         return Status.getSuccessStatus("[Alarm] slot: "+ slot+" overheated， temperature is " + temp);
     }
 }

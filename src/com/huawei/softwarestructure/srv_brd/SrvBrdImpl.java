@@ -18,16 +18,23 @@ public class SrvBrdImpl implements ISrvBrd{
         addListener(Alarm.getInstance());
     }
 
+    public Status notifyTempChanged() {
+        for (SrvBrdListener listener : listeners) {
+            Status status = listener.onSrvHot(slot, temp);
+            if (!status.getResult()) {
+                return status;
+            }
+        }
+        return Status.getSuccessStatus("state hot");
+    }
+
     @Override
     public Status onTempChange(int temp) {
         if (temp == this.temp) {
             return Status.getSuccessStatus("same temp, failed to change");
         }
         this.temp = temp;
-        for (SrvBrdListener listener : listeners) {
-            listener.onSrvHot(slot, temp);
-        }
-        return Status.getSuccessStatus("state hot");
+        return notifyTempChanged();
     }
 
     @Override
