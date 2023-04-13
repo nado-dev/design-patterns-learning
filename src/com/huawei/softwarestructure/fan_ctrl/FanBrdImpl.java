@@ -10,6 +10,7 @@ import com.huawei.softwarestructure.Status;
 import com.huawei.softwarestructure.fan_ctrl.drv.DrvContext;
 import com.huawei.softwarestructure.fan_ctrl.drv.DrvType;
 import com.huawei.softwarestructure.fan_ctrl.drv.IFanDrv;
+import com.huawei.softwarestructure.fan_ctrl.drv.NilFanDrv;
 import com.huawei.softwarestructure.fan_ctrl.drv.drv_neptune.NeptuneFanDrv;
 import com.huawei.softwarestructure.fan_ctrl.drv.drv_neptune.NeptuneFanDrvAdapter;
 import com.huawei.softwarestructure.fan_ctrl.drv.drv_neptune.NeptuneInitStrategy;
@@ -62,6 +63,8 @@ public class FanBrdImpl implements IFanBrd, SrvBrdListener {
             drvContext.setStrategy(new NormalInitStrategy());
             this.fanDrv = new VenusFanDrv();
         }
+        else
+            this.fanDrv = new NilFanDrv();
         drvContext.executeStrategy();
     }
 
@@ -118,6 +121,7 @@ public class FanBrdImpl implements IFanBrd, SrvBrdListener {
     }
 
     public void setCurrFanSpeed(FanSpeed newFanSpeed) {
+        if (fanDrv instanceof NilFanDrv) return;
         Status ret = fanDrv.adjust(newFanSpeed);
         if (ret.isSuccess()) this.currFanSpeed = newFanSpeed;
     }
