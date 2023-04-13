@@ -25,7 +25,7 @@ public class Status {
                 '}';
     }
 
-    public boolean getResult() {
+    public boolean isSuccess() {
         return result;
     }
 

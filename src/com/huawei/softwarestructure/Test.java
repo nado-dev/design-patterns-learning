@@ -45,6 +45,7 @@ public class Test {
         fanCtrlAction.configFanMode(10000, FanBrdModeType.Manual).showStatus();
         // 设置为手动挡之后调速
         fanCtrlAction.manualAdjust(10000, FanSpeed.FAN_SPEED_HIGH).showStatus();
+
         // 根据槽位号查找业务板，模拟采集到的温度先后为100和40
         fanCtrlAction.onSrvTempChanged(20003, 100);
         fanCtrlAction.onSrvTempChanged(20003, 40);

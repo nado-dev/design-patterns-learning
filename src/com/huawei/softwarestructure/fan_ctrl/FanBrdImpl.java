@@ -9,8 +9,13 @@ package com.huawei.softwarestructure.fan_ctrl;
 import com.huawei.softwarestructure.Status;
 import com.huawei.softwarestructure.fan_ctrl.drv.DrvContext;
 import com.huawei.softwarestructure.fan_ctrl.drv.DrvType;
+import com.huawei.softwarestructure.fan_ctrl.drv.IFanDrv;
+import com.huawei.softwarestructure.fan_ctrl.drv.drv_neptune.NeptuneFanDrv;
+import com.huawei.softwarestructure.fan_ctrl.drv.drv_neptune.NeptuneFanDrvAdapter;
 import com.huawei.softwarestructure.fan_ctrl.drv.drv_neptune.NeptuneInitStrategy;
+import com.huawei.softwarestructure.fan_ctrl.drv.drv_normal.MarsFanDrv;
 import com.huawei.softwarestructure.fan_ctrl.drv.drv_normal.NormalInitStrategy;
+import com.huawei.softwarestructure.fan_ctrl.drv.drv_normal.VenusFanDrv;
 import com.huawei.softwarestructure.srv_brd.ISrvBrd;
 import com.huawei.softwarestructure.srv_brd.SrvBrdFactory;
 import com.huawei.softwarestructure.srv_brd.SrvBrdListener;
@@ -27,13 +32,15 @@ public class FanBrdImpl implements IFanBrd, SrvBrdListener {
 
     private FanBrdModeType currModeType;
 
+    private IFanDrv fanDrv;
+
     private final List<ISrvBrd> srvBrds = new ArrayList<>();
 
     FanBrdImpl(FanBrdConfig cfg) {
         this.slotId = cfg.getSlot();
-        currFanSpeed = FanSpeed.FAN_SPEED_STOP;
         currModeType = FanBrdModeType.Automatic; // 默认自动挡
         executeConfig(cfg);
+        setCurrFanSpeed(FanSpeed.FAN_SPEED_STOP); // 默认风扇停止
         System.out.println("[FanBrd] Brd:"+ slotId+", new brd created, "+toString());
     }
 
@@ -45,9 +52,15 @@ public class FanBrdImpl implements IFanBrd, SrvBrdListener {
         DrvContext drvContext = DrvContext.getInstance();
         if (cfg.getCommType() == DrvType.Neptune) {
             drvContext.setStrategy(new NeptuneInitStrategy());
+            this.fanDrv = new NeptuneFanDrvAdapter(new NeptuneFanDrv());
         }
-        else{
+        else if (cfg.getCommType() == DrvType.Mars){
             drvContext.setStrategy(new NormalInitStrategy());
+            this.fanDrv = new MarsFanDrv();
+        }
+        else if (cfg.getCommType() == DrvType.Venus) {
+            drvContext.setStrategy(new NormalInitStrategy());
+            this.fanDrv = new VenusFanDrv();
         }
         drvContext.executeStrategy();
     }
@@ -73,11 +86,13 @@ public class FanBrdImpl implements IFanBrd, SrvBrdListener {
         // todo
         if (temp > 70) {
             setCurrFanSpeed(FanSpeed.FAN_SPEED_HIGH);
+            System.out.println("[FanBrdImpl] slot: "+ slot+" overheated， temperature is " + temp+ ", current fan speed: "+ currFanSpeed);
         }
         else{
             setCurrFanSpeed(FanSpeed.FAN_SPEED_LOW);
+            System.out.println("[FanBrdImpl] slot: "+ slot+" cool down， temperature is " + temp+ ", current fan speed: "+ currFanSpeed);
         }
-        return Status.getSuccessStatus("[FanBrdImpl] slot: "+ slot+" overheated， temperature is " + temp+ ", current fan speed: "+ currFanSpeed);
+        return Status.getSuccessStatus("");
     }
 
     @Override
@@ -102,8 +117,9 @@ public class FanBrdImpl implements IFanBrd, SrvBrdListener {
         return currFanSpeed;
     }
 
-    public void setCurrFanSpeed(FanSpeed currFanSpeed) {
-        this.currFanSpeed = currFanSpeed;
+    public void setCurrFanSpeed(FanSpeed newFanSpeed) {
+        Status ret = fanDrv.adjust(newFanSpeed);
+        if (ret.isSuccess()) this.currFanSpeed = newFanSpeed;
     }
 
     public Status setFanMode(FanBrdModeType modeType) {

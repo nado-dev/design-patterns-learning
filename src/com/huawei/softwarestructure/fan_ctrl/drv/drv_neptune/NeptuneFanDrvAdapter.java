@@ -7,7 +7,7 @@ import com.huawei.softwarestructure.fan_ctrl.drv.IFanDrv;
 public class NeptuneFanDrvAdapter implements IFanDrv {
     private final NeptuneFanDrv neptuneFanDrv;
 
-    NeptuneFanDrvAdapter(NeptuneFanDrv neptuneFanDrv) {
+    public NeptuneFanDrvAdapter(NeptuneFanDrv neptuneFanDrv) {
         this.neptuneFanDrv = neptuneFanDrv;
     }
 

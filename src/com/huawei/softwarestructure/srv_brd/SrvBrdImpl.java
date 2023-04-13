@@ -21,7 +21,7 @@ public class SrvBrdImpl implements ISrvBrd{
     public Status notifyTempChanged() {
         for (SrvBrdListener listener : listeners) {
             Status status = listener.onSrvHot(slot, temp);
-            if (!status.getResult()) {
+            if (!status.isSuccess()) {
                 return status;
             }
         }
