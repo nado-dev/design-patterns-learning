@@ -4,6 +4,7 @@ public enum DrvType {
     Mars,
     Venus,
     // above: normal
-    Neptune
+    Neptune,
     // special
+    UNDEFINED
 }

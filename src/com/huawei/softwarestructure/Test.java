@@ -2,33 +2,58 @@ package com.huawei.softwarestructure;
 
 import com.huawei.softwarestructure.ctrl.FanCtrlAction;
 import com.huawei.softwarestructure.fan_ctrl.*;
-import com.huawei.softwarestructure.fan_ctrl.drv.DrvContext;
 import com.huawei.softwarestructure.fan_ctrl.drv.DrvType;
-import com.huawei.softwarestructure.srv_brd.ISrvBrd;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class Test {
 
     public static void main(String[] args) {
-        // 第一次作业
 	    FanCtrlAction fanCtrlAction = new FanCtrlAction(FanMgrImpl.getInstance());
 
-        List<Integer> fanBrd1SrvBrd = new ArrayList<>(); // 第一块风扇板(slot:10000)管理的业务板(slot:20001,20002)
-        fanBrd1SrvBrd.add(20001);
-        fanBrd1SrvBrd.add(20002);
-	    fanCtrlAction.initFanBrdConfig(new FanBrdConfig(10000, DrvType.Mars, fanBrd1SrvBrd)).showStatus();
+        int fanBrd1Slot = 10000; // 风扇板1的槽位号
+	    /* 风扇盒层次设置，使用组合模式
+	     风扇板槽位为10000
+	     --> 风扇盒10000-10, 驱动Mars
+	     --> 风扇盒10000-11, 有两个子风扇盒
+	         --> 10000-11-110, 驱动Mars
+	         --> 10000-11-111, 驱动Mars
+	     */
+        FanBrdConfig.FanBoxNode fanBoxNode1 = new FanBrdConfig.NodeBuilder(fanBrd1Slot)
+                .addChild(
+                        new FanBrdConfig.NodeBuilder(10, DrvType.Mars)
+                )
+                .addChild(
+                        new FanBrdConfig.NodeBuilder(11)
+                                .addChild(new FanBrdConfig.NodeBuilder(110, DrvType.Mars))
+                                .addChild(new FanBrdConfig.NodeBuilder(111, DrvType.Mars))
+                )
+                .build();
 
-        List<Integer> fanBrd2SrvBrd = new ArrayList<>();// 第二块风扇板(slot:10001)管理的业务板(slot:20003,20004)
-        fanBrd2SrvBrd.add(20003);
-        fanBrd2SrvBrd.add(20004);
-        fanCtrlAction.initFanBrdConfig(new FanBrdConfig(10001, DrvType.Neptune, fanBrd2SrvBrd)).showStatus();
+        fanCtrlAction.initFanBrdConfig(
+                new FanBrdConfig.FanBrdConfigBuilder()
+                        .addFanBrdSlot(fanBrd1Slot)
+                        .addSrvBrd(20001)
+                        .addSrvBrd(20002)
+                        .initFanBoxesSetting(fanBoxNode1)
+                        .build()
+        ).showStatus();
 
-        List<Integer> fanBrd3SrvBrd = new ArrayList<>();// 第三块风扇板(slot:10003)管理的业务板(slot:20005,20006)
-        fanBrd3SrvBrd.add(20005);
-        fanBrd3SrvBrd.add(20006);
-        fanCtrlAction.initFanBrdConfig(new FanBrdConfig(10002, DrvType.Venus, fanBrd3SrvBrd)).showStatus();
+        fanCtrlAction.initFanBrdConfig(
+                new FanBrdConfig.FanBrdConfigBuilder()
+                        .addFanBrdSlot(10001)
+                        .addDrv(DrvType.Neptune)
+                        .addSrvBrd(20003)
+                        .addSrvBrd(20004)
+                        .build()
+        ).showStatus();
+
+        fanCtrlAction.initFanBrdConfig(
+                new FanBrdConfig.FanBrdConfigBuilder()
+                        .addFanBrdSlot(10002)
+                        .addDrv(DrvType.Venus)
+                        .addSrvBrd(20005)
+                        .addSrvBrd(20006)
+                        .build()
+        ).showStatus();
 
         // 默认为自动挡的情况下，此时进行的调速应该失败
         fanCtrlAction.manualAdjust(10000, FanSpeed.FAN_SPEED_HIGH).showStatus();
