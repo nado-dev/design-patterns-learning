@@ -1,6 +1,7 @@
 package com.huawei.softwarestructure.fan_ctrl.fan_box;
 
 import com.huawei.softwarestructure.Status;
+import com.huawei.softwarestructure.fan_ctrl.FanBrdConfig;
 import com.huawei.softwarestructure.fan_ctrl.FanSpeed;
 
 import java.util.ArrayList;
@@ -23,11 +24,17 @@ public class CompositeFanBox implements IFanBox{
 
     @Override
     public Status adjustFanSpeed(FanSpeed fanSpeed) {
-        System.out.println("Composite is being operated.");
         for (IFanBox component : children) {
             Status ret = component.adjustFanSpeed(fanSpeed);
             if (!ret.isSuccess()) return ret;
         }
         return Status.getSuccessStatus("[CompositeFanBox] operation done for children");
+    }
+
+    @Override
+    public String toString() {
+        return "CompositeFanBox{" +
+                "children=" + children +
+                '}';
     }
 }

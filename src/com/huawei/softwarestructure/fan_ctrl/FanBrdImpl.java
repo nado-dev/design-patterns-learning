@@ -7,16 +7,10 @@ package com.huawei.softwarestructure.fan_ctrl;
  ***********************************************************************/
 
 import com.huawei.softwarestructure.Status;
-import com.huawei.softwarestructure.fan_ctrl.drv.DrvContext;
-import com.huawei.softwarestructure.fan_ctrl.drv.DrvType;
 import com.huawei.softwarestructure.fan_ctrl.drv.IFanDrv;
 import com.huawei.softwarestructure.fan_ctrl.drv.NilFanDrv;
-import com.huawei.softwarestructure.fan_ctrl.drv.drv_neptune.NeptuneFanDrv;
-import com.huawei.softwarestructure.fan_ctrl.drv.drv_neptune.NeptuneFanDrvAdapter;
-import com.huawei.softwarestructure.fan_ctrl.drv.drv_neptune.NeptuneInitStrategy;
-import com.huawei.softwarestructure.fan_ctrl.drv.drv_normal.MarsFanDrv;
-import com.huawei.softwarestructure.fan_ctrl.drv.drv_normal.NormalInitStrategy;
-import com.huawei.softwarestructure.fan_ctrl.drv.drv_normal.VenusFanDrv;
+import com.huawei.softwarestructure.fan_ctrl.fan_box.FanBoxUtils;
+import com.huawei.softwarestructure.fan_ctrl.fan_box.IFanBox;
 import com.huawei.softwarestructure.srv_brd.ISrvBrd;
 import com.huawei.softwarestructure.srv_brd.SrvBrdFactory;
 import com.huawei.softwarestructure.srv_brd.SrvBrdListener;
@@ -27,22 +21,41 @@ import java.util.List;
 
 public class FanBrdImpl implements IFanBrd, SrvBrdListener {
 
+    /**
+     * 风扇板槽位
+     */
     private int slotId;
 
+    /**
+     * 当前转速
+     */
     private FanSpeed currFanSpeed;
 
+    /**
+     * 当前模式：手动/自动
+     */
     private FanBrdModeType currModeType;
 
+    /**
+     * 风扇板统一驱动（老版本）
+     */
     private IFanDrv fanDrv;
 
+    /**
+     * 所有管理的业务板
+     */
     private final List<ISrvBrd> srvBrds = new ArrayList<>();
+
+    /**
+     * 风扇盒的抽象，有统一的调速接口
+     */
+    private IFanBox iFanBox;
 
     FanBrdImpl(FanBrdConfig cfg) {
         this.slotId = cfg.getSlot();
         currModeType = FanBrdModeType.Automatic; // 默认自动挡
         executeConfig(cfg);
-        setCurrFanSpeed(FanSpeed.FAN_SPEED_STOP); // 默认风扇停止
-        System.out.println("[FanBrd] Brd:"+ slotId+", new brd created, "+toString());
+        setCurrFanSpeed(FanSpeed.FAN_SPEED_STOP);
     }
 
     /**
@@ -50,22 +63,9 @@ public class FanBrdImpl implements IFanBrd, SrvBrdListener {
      * @param cfg 配置文件信息
      */
     private void executeConfig(FanBrdConfig cfg) {
-        DrvContext drvContext = DrvContext.getInstance();
-        if (cfg.getCommType() == DrvType.Neptune) {
-            drvContext.setStrategy(new NeptuneInitStrategy());
-            this.fanDrv = new NeptuneFanDrvAdapter(new NeptuneFanDrv());
-        }
-        else if (cfg.getCommType() == DrvType.Mars){
-            drvContext.setStrategy(new NormalInitStrategy());
-            this.fanDrv = new MarsFanDrv();
-        }
-        else if (cfg.getCommType() == DrvType.Venus) {
-            drvContext.setStrategy(new NormalInitStrategy());
-            this.fanDrv = new VenusFanDrv();
-        }
-        else
-            this.fanDrv = new NilFanDrv();
-        drvContext.executeStrategy();
+        this.fanDrv = FanBoxUtils.getFanDrvByType(cfg.getCommType());
+        iFanBox = FanBoxUtils.copyFrom(cfg.getFanBoxNode());
+        FanBoxUtils.executeStrategy(cfg.getCommType());
     }
 
     public boolean isMatch(int slotId) {
@@ -86,7 +86,6 @@ public class FanBrdImpl implements IFanBrd, SrvBrdListener {
         if (currModeType == FanBrdModeType.Manual) {
             return Status.getFailStatus("[FanBrd] Brd: "+slotId+", 手动模式下不会根据业务板温度执行任何操作");
         }
-        // todo
         if (temp > 70) {
             setCurrFanSpeed(FanSpeed.FAN_SPEED_HIGH);
             System.out.println("[FanBrdImpl] slot: "+ slot+" overheated， temperature is " + temp+ ", current fan speed: "+ currFanSpeed);
@@ -122,7 +121,8 @@ public class FanBrdImpl implements IFanBrd, SrvBrdListener {
 
     public void setCurrFanSpeed(FanSpeed newFanSpeed) {
         if (fanDrv instanceof NilFanDrv) return;
-        Status ret = fanDrv.adjust(newFanSpeed);
+        Status ret = iFanBox.adjustFanSpeed(newFanSpeed);// 新风扇板
+        fanDrv.adjust(newFanSpeed); // 老风扇板
         if (ret.isSuccess()) this.currFanSpeed = newFanSpeed;
     }
 
@@ -144,11 +144,13 @@ public class FanBrdImpl implements IFanBrd, SrvBrdListener {
 
     @Override
     public String toString() {
-        return "FanBrd{" +
+        return "FanBrdImpl{" +
                 "slotId=" + slotId +
                 ", currFanSpeed=" + currFanSpeed +
                 ", currModeType=" + currModeType +
+                ", fanDrv=" + fanDrv +
+                ", srvBrds=" + srvBrds +
+                ", iFanBox=" + iFanBox +
                 '}';
     }
-
 }

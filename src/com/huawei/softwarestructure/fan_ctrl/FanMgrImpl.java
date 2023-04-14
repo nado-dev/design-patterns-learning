@@ -25,9 +25,6 @@ public class FanMgrImpl implements IFanMgr {
     public Status initConfig(FanBrdConfig cfg) {
         // 创建风扇板
         IFanBrd brd = FanBrdFactory.makeFanBrd(cfg);
-        if (brd == null) {
-            return Status.getFailStatus("Fan Board Create failed");
-        }
         IFanBrdList.add(brd);
         // 配置业务板
         brd.configSrvBrds(cfg).showStatus();

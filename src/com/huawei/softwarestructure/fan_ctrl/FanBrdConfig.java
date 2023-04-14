@@ -22,18 +22,15 @@ public class FanBrdConfig {
      */
     private FanBoxNode fanBoxNode;
 
+    /**
+     * 风扇板的总驱动配置
+     */
     private DrvType commType;
 
     /**
      * 风扇板管理的业务板逻辑对象列表
      */
-    private List<Integer> srvBrdSlotList;
-
-    public FanBrdConfig(int slotNum, DrvType commType, List<Integer> srvBrdSlotList){
-        this.slot = slotNum;
-        this.commType = commType;
-        this.srvBrdSlotList = srvBrdSlotList;
-    }
+    private final List<Integer> srvBrdSlotList;
 
     public FanBrdConfig(int slotNum, DrvType commType, List<Integer> srvBrdSlotList, FanBoxNode fanBoxNode){
         this.slot = slotNum;
@@ -42,9 +39,8 @@ public class FanBrdConfig {
         this.fanBoxNode = fanBoxNode;
     }
 
-
-    public void setSlot(int slot) {
-        this.slot = slot;
+    public FanBoxNode getFanBoxNode() {
+        return fanBoxNode;
     }
 
     public int getSlot() {
@@ -55,16 +51,8 @@ public class FanBrdConfig {
         return commType;
     }
 
-    public void setCommType(DrvType commType) {
-        this.commType = commType;
-    }
-
     public List<Integer> getSrvBrdSlotList() {
         return srvBrdSlotList;
-    }
-
-    public void setSrvBrdSlotList(List<Integer> srvBrdSlotList) {
-        this.srvBrdSlotList = srvBrdSlotList;
     }
 
     /**
@@ -102,10 +90,13 @@ public class FanBrdConfig {
     }
 
 
+    /**
+     * 表示风扇盒配置层级信息
+     */
     public static class FanBoxNode {
-        private int slot;
-        private DrvType drvType = DrvType.UNDEFINED;
-        private final List<FanBoxNode> children = new ArrayList<>();
+        public int slot;
+        public DrvType drvType = DrvType.UNDEFINED;
+        public final List<FanBoxNode> children = new ArrayList<>();
 
         public FanBoxNode(int slot) {
             this.slot = slot;
@@ -116,7 +107,7 @@ public class FanBrdConfig {
             this.slot = slot;
         }
 
-        public boolean isLeaveNode() {
+        public boolean isLeafNode() {
             return children.size() == 0;
         }
 
@@ -126,6 +117,9 @@ public class FanBrdConfig {
 
     }
 
+    /**
+     * FanBoxNode的构建器
+     */
     public static class NodeBuilder {
         private int slot;
         private DrvType drvType = DrvType.UNDEFINED;
